@@ -6,6 +6,7 @@ from datetime import timedelta
 
 DOMAIN = "puk_rumia"
 CONF_UNIT_ID = "unit_id"
+API_PARAM_UNIT_ID = "unitId"
 OWNER_ID = 44
 
 BINS_ENDPOINT = f"https://gateway.sisms.pl/akun/api/owners/{OWNER_ID}/bins/list"

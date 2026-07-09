@@ -16,8 +16,8 @@ from homeassistant.helpers.update_coordinator import DataUpdateCoordinator, Upda
 
 try:
     from .const import (
+        API_PARAM_UNIT_ID,
         BINS_ENDPOINT,
-        CONF_UNIT_ID,
         DOMAIN,
         NOTIFICATION_ID_PREFIX,
         TIMETABLE_ENDPOINT,
@@ -26,8 +26,8 @@ try:
     from .parsing import BinDefinition, extract_bins, extract_next_pickups
 except ImportError:  # pragma: no cover - local test fallback
     from const import (
+        API_PARAM_UNIT_ID,
         BINS_ENDPOINT,
-        CONF_UNIT_ID,
         DOMAIN,
         NOTIFICATION_ID_PREFIX,
         TIMETABLE_ENDPOINT,
@@ -73,7 +73,7 @@ class PukRumiaDataUpdateCoordinator(DataUpdateCoordinator[CoordinatorData]):
         """Fetch JSON payload from SISMS API endpoint."""
         async with self._session.get(
             endpoint,
-            params={CONF_UNIT_ID: self.unit_id},
+            params={API_PARAM_UNIT_ID: self.unit_id},
             timeout=ClientTimeout(total=20),
         ) as response:
             response.raise_for_status()
