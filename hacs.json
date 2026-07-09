@@ -1,0 +1,9 @@
+{
+    "name": "PUK Rumia Trash Pickup",
+    "content_in_root": true,
+    "homeassistant": "2024.8.0",
+    "domains": [
+        "puk_rumia"
+    ],
+    "render_readme": true
+}

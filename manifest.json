@@ -1,0 +1,15 @@
+{
+    "domain": "puk_rumia",
+    "name": "PUK Rumia Trash Pickup",
+    "codeowners": [
+        "@tripl"
+    ],
+    "config_flow": true,
+    "integration_type": "service",
+    "iot_class": "cloud_polling",
+    "loggers": [
+        "custom_components.puk_rumia"
+    ],
+    "requirements": [],
+    "version": "0.1.0"
+}

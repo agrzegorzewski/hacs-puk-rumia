@@ -1,0 +1,19 @@
+{
+    "config": {
+        "step": {
+            "user": {
+                "title": "Connect to PUK Rumia",
+                "description": "Enter the unitId used by the SISMS API.",
+                "data": {
+                    "unit_id": "Unit ID"
+                }
+            }
+        },
+        "error": {
+            "required": "Unit ID is required"
+        },
+        "abort": {
+            "already_configured": "This unit is already configured"
+        }
+    }
+}

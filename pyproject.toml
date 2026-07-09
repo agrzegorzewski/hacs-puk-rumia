@@ -1,0 +1,24 @@
+[project]
+name = "hacs-puk-rumia"
+version = "0.1.0"
+description = "Simple Home Assistant custom integration for PUK Rumia pickup dates"
+readme = "README.md"
+requires-python = ">=3.14.2"
+dependencies = []
+
+[dependency-groups]
+dev = [
+    "aiohttp>=3.12",
+    "homeassistant>=2026.6.0",
+    "pytest>=8.3",
+    "pytest-asyncio>=1.1",
+    "voluptuous>=0.15",
+]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+addopts = "--ignore=__init__.py"
+
+[tool.uv]
+package = false
+default-groups = ["dev"]
