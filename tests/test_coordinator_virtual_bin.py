@@ -39,7 +39,9 @@ class TestCoordinatorVirtualBin(unittest.TestCase):
         )
 
         self.assertIn(VIRTUAL_SEGREGATED_BIN_ID, bins_out)
-        self.assertEqual(bins_out[VIRTUAL_SEGREGATED_BIN_ID].name, VIRTUAL_SEGREGATED_BIN_NAME)
+        self.assertEqual(
+            bins_out[VIRTUAL_SEGREGATED_BIN_ID].name, VIRTUAL_SEGREGATED_BIN_NAME
+        )
         self.assertEqual(next_pickups_out[VIRTUAL_SEGREGATED_BIN_ID], date(2026, 7, 20))
         self.assertIsNone(mismatch)
 

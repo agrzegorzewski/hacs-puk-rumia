@@ -70,7 +70,7 @@ class PukRumiaPickupSensor(
         self._attr_native_value: StateType | date | datetime | Decimal = None
         self._attr_extra_state_attributes: dict[str, int | str | None] = {}
         self._attr_unique_id = f"{entry_id}_{bin_definition.bin_id}_pickup_date"
-        self._attr_name = f"{bin_definition.name} pickup"
+        self._attr_name = f"{bin_definition.name}"
         self._attr_device_info = DeviceInfo(
             identifiers={(DOMAIN, entry_id)},
             name="PUK Rumia Trash Pickup",
