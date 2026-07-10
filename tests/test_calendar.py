@@ -9,6 +9,7 @@ from types import SimpleNamespace
 import unittest
 from unittest.mock import MagicMock
 
+from const import VIRTUAL_SEGREGATED_BIN_ID
 from parsing import BinDefinition
 
 _CALENDAR_MODULE_PATH = Path(__file__).resolve().parents[1] / "calendar.py"
@@ -53,3 +54,24 @@ class TestCalendarMinimal(unittest.IsolatedAsyncioTestCase):
         )
         self.assertEqual(len(events), 1)
         self.assertEqual(events[0].start, date(2026, 7, 21))
+        self.assertEqual(getattr(entity, "_attr_color"), "#2a2e34")
+
+    async def test_calendar_uses_dark_green_for_virtual_bin(self) -> None:
+        """Virtual segregated bin should always use dark green color."""
+        bin_definition = BinDefinition(
+            bin_id=VIRTUAL_SEGREGATED_BIN_ID,
+            name="Odpady segregowane",
+            waste_type="SEGREGATED",
+            color="#ffffff",
+        )
+        coordinator = MagicMock()
+        coordinator.data = SimpleNamespace(
+            bins={VIRTUAL_SEGREGATED_BIN_ID: bin_definition},
+            pickup_dates={VIRTUAL_SEGREGATED_BIN_ID: [date(2026, 7, 21)]},
+        )
+        coordinator.last_update_success = True
+        coordinator.async_add_listener = MagicMock(return_value=lambda: None)
+
+        entity = PukRumiaPickupCalendar(coordinator, "entry-1", bin_definition)
+
+        self.assertEqual(getattr(entity, "_attr_color"), "#006400")

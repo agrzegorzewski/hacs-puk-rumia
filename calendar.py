@@ -13,10 +13,10 @@ from homeassistant.helpers.device_registry import DeviceInfo
 from homeassistant.helpers.entity_platform import AddEntitiesCallback
 
 try:
-    from .const import DOMAIN
+    from .const import DOMAIN, VIRTUAL_SEGREGATED_BIN_ID
     from .parsing import BinDefinition
 except ImportError:  # pragma: no cover - local test fallback
-    from const import DOMAIN
+    from const import DOMAIN, VIRTUAL_SEGREGATED_BIN_ID
     from parsing import BinDefinition
 
 
@@ -33,6 +33,8 @@ _SHORT_BIN_NAMES: Mapping[str, str] = {
     "Odpady zielone": "Zielone",
     "Elektroodpady": "Elektro",
 }
+
+_VIRTUAL_SEGREGATED_EVENT_COLOR = "#006400"
 
 
 class _CoordinatorDataLike(Protocol):
@@ -84,9 +86,15 @@ class PukRumiaPickupCalendar(CalendarEntity):
             manufacturer="sisms.pl",
             model="Unit timetable",
         )
-        self._attr_initial_color = bin_definition.color
+        self._attr_color = self._event_color()
         self._event: CalendarEvent | None = None
         self._update_attrs()
+
+    def _event_color(self) -> str | None:
+        """Return the calendar color for this bin."""
+        if self._bin.bin_id == VIRTUAL_SEGREGATED_BIN_ID:
+            return _VIRTUAL_SEGREGATED_EVENT_COLOR
+        return self._bin.color
 
     @property
     def event(self) -> CalendarEvent | None:
