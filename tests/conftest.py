@@ -62,6 +62,7 @@ def _register_homeassistant_stubs() -> None:
     setattr(config_entries, "HANDLERS", _Handlers())
 
     sensor_mod = ModuleType("homeassistant.components.sensor")
+    calendar_mod = ModuleType("homeassistant.components.calendar")
 
     class _SensorDeviceClass:
         DATE = "date"
@@ -76,6 +77,29 @@ def _register_homeassistant_stubs() -> None:
 
     setattr(sensor_mod, "SensorDeviceClass", _SensorDeviceClass)
     setattr(sensor_mod, "SensorEntity", SensorEntity)
+
+    class CalendarEvent:
+        def __init__(
+            self,
+            start: Any,
+            end: Any,
+            summary: str,
+            description: str | None = None,
+        ) -> None:
+            self.start = start
+            self.end = end
+            self.summary = summary
+            self.description = description
+
+    class CalendarEntity:
+        async def async_will_remove_from_hass(self) -> None:
+            return None
+
+        def async_write_ha_state(self) -> None:
+            return None
+
+    setattr(calendar_mod, "CalendarEntity", CalendarEntity)
+    setattr(calendar_mod, "CalendarEvent", CalendarEvent)
 
     core_mod = ModuleType("homeassistant.core")
     const_mod = ModuleType("homeassistant.const")
@@ -93,6 +117,7 @@ def _register_homeassistant_stubs() -> None:
 
     class _Platform:
         SENSOR = "sensor"
+        CALENDAR = "calendar"
 
     async def async_get_clientsession(_hass: Any) -> Any:
         return None
@@ -117,6 +142,7 @@ def _register_homeassistant_stubs() -> None:
     sys.modules["homeassistant.config_entries"] = config_entries
     sys.modules["homeassistant.const"] = const_mod
     sys.modules["homeassistant.components.sensor"] = sensor_mod
+    sys.modules["homeassistant.components.calendar"] = calendar_mod
     sys.modules["homeassistant.core"] = core_mod
     sys.modules["homeassistant.helpers"] = helpers_mod
     sys.modules["homeassistant.helpers.aiohttp_client"] = aiohttp_client_mod

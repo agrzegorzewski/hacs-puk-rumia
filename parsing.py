@@ -49,7 +49,7 @@ def extract_bins(payload: Mapping[str, Any]) -> dict[int, BinDefinition]:
         try:
             bin_id = int(item["id"])
             name = str(item["name"])
-        except KeyError, TypeError, ValueError:
+        except (KeyError, TypeError, ValueError):
             continue
 
         bins[bin_id] = BinDefinition(
@@ -66,12 +66,20 @@ def extract_next_pickups(
     payload: Mapping[str, Any], today: date | None = None
 ) -> dict[int, date]:
     """Return nearest upcoming reception date for each bin id."""
+    all_pickups = extract_pickup_dates(payload, today=today)
+    return {bin_id: dates[0] for bin_id, dates in all_pickups.items() if dates}
+
+
+def extract_pickup_dates(
+    payload: Mapping[str, Any], today: date | None = None
+) -> dict[int, list[date]]:
+    """Return all upcoming reception dates for each bin id."""
     data = payload.get("data")
     if not isinstance(data, list):
         raise ValueError("Timetable payload does not contain a valid data list")
 
     reference = today or date.today()
-    next_pickups: dict[int, date] = {}
+    pickup_dates: dict[int, list[date]] = {}
 
     for month in data:
         if not isinstance(month, Mapping):
@@ -88,17 +96,18 @@ def extract_next_pickups(
             try:
                 bin_id = int(reception["binId"])
                 pickup_date = parse_iso8601_date(str(reception["date"]))
-            except KeyError, TypeError, ValueError:
+            except (KeyError, TypeError, ValueError):
                 continue
 
             if pickup_date < reference:
                 continue
 
-            current = next_pickups.get(bin_id)
-            if current is None or pickup_date < current:
-                next_pickups[bin_id] = pickup_date
+            pickup_dates.setdefault(bin_id, []).append(pickup_date)
 
-    return next_pickups
+    for bin_id, dates in pickup_dates.items():
+        pickup_dates[bin_id] = sorted(set(dates))
+
+    return pickup_dates
 
 
 def add_virtual_bin_from_names(
