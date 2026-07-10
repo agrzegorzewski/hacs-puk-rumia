@@ -54,7 +54,7 @@ class TestCalendarMinimal(unittest.IsolatedAsyncioTestCase):
         )
         self.assertEqual(len(events), 1)
         self.assertEqual(events[0].start, date(2026, 7, 21))
-        self.assertEqual(getattr(entity, "_attr_color"), "#2a2e34")
+        self.assertEqual(getattr(entity, "_attr_initial_color"), "#2a2e34")
 
     async def test_calendar_uses_dark_green_for_virtual_bin(self) -> None:
         """Virtual segregated bin should always use dark green color."""
@@ -74,4 +74,4 @@ class TestCalendarMinimal(unittest.IsolatedAsyncioTestCase):
 
         entity = PukRumiaPickupCalendar(coordinator, "entry-1", bin_definition)
 
-        self.assertEqual(getattr(entity, "_attr_color"), "#006400")
+        self.assertEqual(getattr(entity, "_attr_initial_color"), "#006400")
