@@ -5,7 +5,12 @@ from __future__ import annotations
 from datetime import date
 import unittest
 
-from parsing import extract_bins, extract_next_pickups, parse_iso8601_date
+from parsing import (
+    extract_bins,
+    extract_next_pickups,
+    extract_pickup_dates,
+    parse_iso8601_date,
+)
 
 
 class TestParsing(unittest.TestCase):
@@ -52,8 +57,11 @@ class TestParsing(unittest.TestCase):
 
         bins = extract_bins(bins_payload)
         next_pickups = extract_next_pickups(timetable_payload, today=date(2026, 7, 9))
+        pickup_dates = extract_pickup_dates(timetable_payload, today=date(2026, 7, 9))
 
         self.assertEqual(bins[309].name, "Zmieszane")
         self.assertEqual(bins[310].waste_type, "BLUE")
         self.assertEqual(next_pickups[309], date(2026, 7, 21))
         self.assertEqual(next_pickups[310], date(2026, 7, 22))
+        self.assertEqual(pickup_dates[309], [date(2026, 7, 21)])
+        self.assertEqual(pickup_dates[310], [date(2026, 7, 22)])

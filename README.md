@@ -11,6 +11,7 @@ This repository uses a flat layout for HACS, configured with `content_in_root: t
 - Configurable `unitId` through the Home Assistant config flow.
 - Shared `DataUpdateCoordinator` refresh every 6 hours.
 - One `SensorEntity` per waste bin type returned by the API.
+- One `CalendarEntity` per waste bin type for Lovelace Calendar integration.
 - Additional virtual sensor `Odpady segregowane` derived from:
 	- `Szkło`
 	- `Papier i tektura`
@@ -42,6 +43,11 @@ This repository uses a flat layout for HACS, configured with `content_in_root: t
 - The integration creates one date sensor per bin returned by the bins API.
 - Sensor value is the next upcoming pickup date for that bin.
 - Extra attributes include `bin_id`, `waste_type`, and `color`.
+
+### Calendars
+
+- The integration creates one calendar entity per bin.
+- Calendar events are generated from all upcoming pickup dates for that bin.
 
 ### API endpoints used
 

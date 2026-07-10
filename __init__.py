@@ -12,7 +12,7 @@ try:
 except ImportError:  # pragma: no cover - local test fallback
     from const import CONF_UNIT_ID, DOMAIN
 
-PLATFORMS: list[Platform] = [Platform.SENSOR]
+PLATFORMS: list[Platform] = [Platform.SENSOR, Platform.CALENDAR]
 
 
 async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:

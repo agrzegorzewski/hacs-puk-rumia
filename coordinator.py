@@ -31,7 +31,7 @@ try:
         BinDefinition,
         add_virtual_bin_from_names,
         extract_bins,
-        extract_next_pickups,
+        extract_pickup_dates,
     )
 except ImportError:  # pragma: no cover - local test fallback
     from const import (
@@ -50,7 +50,7 @@ except ImportError:  # pragma: no cover - local test fallback
         BinDefinition,
         add_virtual_bin_from_names,
         extract_bins,
-        extract_next_pickups,
+        extract_pickup_dates,
     )
 
 _LOGGER = logging.getLogger(__name__)
@@ -62,6 +62,7 @@ class CoordinatorData:
 
     bins: dict[int, BinDefinition]
     next_pickups: dict[int, date]
+    pickup_dates: dict[int, list[date]]
 
 
 class PukRumiaDataUpdateCoordinator(DataUpdateCoordinator[CoordinatorData]):
@@ -116,7 +117,10 @@ class PukRumiaDataUpdateCoordinator(DataUpdateCoordinator[CoordinatorData]):
             if not bins:
                 raise ValueError("Bins endpoint returned no valid bins")
 
-            next_pickups = extract_next_pickups(timetable_payload)
+            pickup_dates = extract_pickup_dates(timetable_payload)
+            next_pickups = {
+                bin_id: dates[0] for bin_id, dates in pickup_dates.items() if dates
+            }
             bins, next_pickups, mismatch_details = add_virtual_bin_from_names(
                 bins,
                 next_pickups,
@@ -125,7 +129,13 @@ class PukRumiaDataUpdateCoordinator(DataUpdateCoordinator[CoordinatorData]):
                 virtual_bin_name=VIRTUAL_SEGREGATED_BIN_NAME,
                 virtual_waste_type="SEGREGATED",
             )
-            data = CoordinatorData(bins=bins, next_pickups=next_pickups)
+            if (virtual_next_pickup := next_pickups.get(VIRTUAL_SEGREGATED_BIN_ID)) is not None:
+                pickup_dates[VIRTUAL_SEGREGATED_BIN_ID] = [virtual_next_pickup]
+            data = CoordinatorData(
+                bins=bins,
+                next_pickups=next_pickups,
+                pickup_dates=pickup_dates,
+            )
 
             persistent_notification.async_dismiss(self.hass, self.notification_id)
             if mismatch_details is None:
