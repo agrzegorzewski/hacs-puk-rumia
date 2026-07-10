@@ -48,6 +48,7 @@ This repository uses a flat layout for HACS, configured with `content_in_root: t
 
 - The integration creates one calendar entity per bin.
 - Calendar events are generated from all upcoming pickup dates for that bin.
+- Calendar events are automatically colored based on the bin color returned by the API.
 
 ### API endpoints used
 

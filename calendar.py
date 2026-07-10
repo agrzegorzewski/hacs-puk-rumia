@@ -84,7 +84,7 @@ class PukRumiaPickupCalendar(CalendarEntity):
             manufacturer="sisms.pl",
             model="Unit timetable",
         )
-        self._attr_color = self._bin.color
+        self._attr_initial_color = self._bin.color
         self._event: CalendarEvent | None = None
         self._update_attrs()
 
@@ -106,7 +106,6 @@ class PukRumiaPickupCalendar(CalendarEntity):
     def _update_attrs(self) -> None:
         """Refresh calendar state from coordinator data."""
         self._attr_available = self.coordinator.last_update_success
-        self._attr_color = self._bin.color
         pickup_dates = self.coordinator.data.pickup_dates.get(self._bin.bin_id, [])
         self._event = self._build_event(pickup_dates[0]) if pickup_dates else None
 
