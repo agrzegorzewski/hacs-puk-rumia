@@ -84,6 +84,7 @@ class PukRumiaPickupCalendar(CalendarEntity):
             manufacturer="sisms.pl",
             model="Unit timetable",
         )
+        self._attr_initial_color = self._bin.color
         self._event: CalendarEvent | None = None
         self._update_attrs()
 
