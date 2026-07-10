@@ -25,6 +25,7 @@ _SHORT_BIN_NAMES: Mapping[str, str] = {
     "Zmieszane odpady komunalne": "Zmieszane",
     "Papier i tektura": "Papier",
     "Odpady biodegradowalne": "Bio",
+    "Odpady segregowane": "Segregowane",
     "Tworzywa sztuczne i metale": "Plastik",
     "Szkło": "Szkło",
     "Popiół": "Popiół",
