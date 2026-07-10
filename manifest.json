@@ -2,7 +2,7 @@
     "domain": "puk_rumia",
     "name": "PUK Rumia Trash Pickup",
     "codeowners": [
-        "@tripl"
+        "@agrzegorzewski"
     ],
     "config_flow": true,
     "integration_type": "service",
@@ -11,5 +11,5 @@
         "custom_components.puk_rumia"
     ],
     "requirements": [],
-    "version": "0.1.0"
+    "version": "1.1.0"
 }

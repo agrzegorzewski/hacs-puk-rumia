@@ -99,3 +99,50 @@ def extract_next_pickups(
                 next_pickups[bin_id] = pickup_date
 
     return next_pickups
+
+
+def add_virtual_bin_from_names(
+    bins: Mapping[int, BinDefinition],
+    next_pickups: Mapping[int, date],
+    *,
+    source_bin_names: set[str] | frozenset[str],
+    virtual_bin_id: int,
+    virtual_bin_name: str,
+    virtual_waste_type: str,
+) -> tuple[dict[int, BinDefinition], dict[int, date], dict[str, date | None] | None]:
+    """Add a virtual bin from named source bins and return mismatch details if any."""
+    normalized_sources = {name.strip().casefold() for name in source_bin_names}
+    source_bins = [
+        bin_definition
+        for bin_definition in bins.values()
+        if bin_definition.name.strip().casefold() in normalized_sources
+    ]
+
+    if len(source_bins) != len(normalized_sources):
+        return dict(bins), dict(next_pickups), None
+
+    bins_with_virtual = dict(bins)
+    bins_with_virtual[virtual_bin_id] = BinDefinition(
+        bin_id=virtual_bin_id,
+        name=virtual_bin_name,
+        waste_type=virtual_waste_type,
+        color=source_bins[0].color,
+    )
+
+    pickups_with_virtual = dict(next_pickups)
+    source_values = {
+        bin_definition.name: next_pickups.get(bin_definition.bin_id)
+        for bin_definition in source_bins
+    }
+    available_dates = [value for value in source_values.values() if value is not None]
+
+    if available_dates:
+        pickups_with_virtual[virtual_bin_id] = min(available_dates)
+
+    mismatch = None
+    if available_dates and (
+        len(set(available_dates)) > 1 or len(available_dates) != len(source_values)
+    ):
+        mismatch = source_values
+
+    return bins_with_virtual, pickups_with_virtual, mismatch

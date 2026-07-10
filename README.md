@@ -11,9 +11,14 @@ This repository uses a flat layout for HACS, configured with `content_in_root: t
 - Configurable `unitId` through the Home Assistant config flow.
 - Shared `DataUpdateCoordinator` refresh every 6 hours.
 - One `SensorEntity` per waste bin type returned by the API.
+- Additional virtual sensor `Odpady segregowane` derived from:
+	- `Szkło`
+	- `Papier i tektura`
+	- `Tworzywa sztuczne i metale`
 - Each sensor uses `SensorDeviceClass.DATE`.
 - Incoming ISO 8601 strings are parsed into native Python `date` objects.
 - Persistent Home Assistant notification is raised whenever API update fails.
+- A soft warning notification is raised if the three segregated source bins have different dates.
 
 ### Installation (HACS)
 

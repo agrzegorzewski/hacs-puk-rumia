@@ -20,20 +20,38 @@ try:
         BINS_ENDPOINT,
         DOMAIN,
         NOTIFICATION_ID_PREFIX,
+        SEGREGATED_SOURCE_BIN_NAMES,
+        SOFT_WARNING_NOTIFICATION_ID_PREFIX,
         TIMETABLE_ENDPOINT,
         UPDATE_INTERVAL,
+        VIRTUAL_SEGREGATED_BIN_ID,
+        VIRTUAL_SEGREGATED_BIN_NAME,
     )
-    from .parsing import BinDefinition, extract_bins, extract_next_pickups
+    from .parsing import (
+        BinDefinition,
+        add_virtual_bin_from_names,
+        extract_bins,
+        extract_next_pickups,
+    )
 except ImportError:  # pragma: no cover - local test fallback
     from const import (
         API_PARAM_UNIT_ID,
         BINS_ENDPOINT,
         DOMAIN,
         NOTIFICATION_ID_PREFIX,
+        SEGREGATED_SOURCE_BIN_NAMES,
+        SOFT_WARNING_NOTIFICATION_ID_PREFIX,
         TIMETABLE_ENDPOINT,
         UPDATE_INTERVAL,
+        VIRTUAL_SEGREGATED_BIN_ID,
+        VIRTUAL_SEGREGATED_BIN_NAME,
     )
-    from parsing import BinDefinition, extract_bins, extract_next_pickups
+    from parsing import (
+        BinDefinition,
+        add_virtual_bin_from_names,
+        extract_bins,
+        extract_next_pickups,
+    )
 
 _LOGGER = logging.getLogger(__name__)
 
@@ -69,6 +87,11 @@ class PukRumiaDataUpdateCoordinator(DataUpdateCoordinator[CoordinatorData]):
         """Return the persistent notification id for this config entry."""
         return f"{NOTIFICATION_ID_PREFIX}_{self.unit_id}"
 
+    @property
+    def soft_warning_notification_id(self) -> str:
+        """Return the persistent soft-warning notification id for this config entry."""
+        return f"{SOFT_WARNING_NOTIFICATION_ID_PREFIX}_{self.unit_id}"
+
     async def _async_fetch_json(self, endpoint: str) -> dict[str, Any]:
         """Fetch JSON payload from SISMS API endpoint."""
         async with self._session.get(
@@ -94,9 +117,34 @@ class PukRumiaDataUpdateCoordinator(DataUpdateCoordinator[CoordinatorData]):
                 raise ValueError("Bins endpoint returned no valid bins")
 
             next_pickups = extract_next_pickups(timetable_payload)
+            bins, next_pickups, mismatch_details = add_virtual_bin_from_names(
+                bins,
+                next_pickups,
+                source_bin_names=SEGREGATED_SOURCE_BIN_NAMES,
+                virtual_bin_id=VIRTUAL_SEGREGATED_BIN_ID,
+                virtual_bin_name=VIRTUAL_SEGREGATED_BIN_NAME,
+                virtual_waste_type="SEGREGATED",
+            )
             data = CoordinatorData(bins=bins, next_pickups=next_pickups)
 
             persistent_notification.async_dismiss(self.hass, self.notification_id)
+            if mismatch_details is None:
+                persistent_notification.async_dismiss(
+                    self.hass, self.soft_warning_notification_id
+                )
+            else:
+                warning_message = (
+                    "Detected mismatch in segregated waste pickup dates for "
+                    f"unitId={self.unit_id}: {mismatch_details}. "
+                    "Virtual bin 'Odpady segregowane' uses the earliest available date."
+                )
+                _LOGGER.warning(warning_message)
+                persistent_notification.async_create(
+                    self.hass,
+                    warning_message,
+                    title="PUK Rumia integration warning",
+                    notification_id=self.soft_warning_notification_id,
+                )
             return data
         except (ClientError, asyncio.TimeoutError, ValueError) as err:
             message = (
