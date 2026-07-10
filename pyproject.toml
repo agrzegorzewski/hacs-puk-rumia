@@ -15,6 +15,9 @@ dev = [
     "voluptuous>=0.15",
 ]
 
+[tool.pylint.messages_control]
+disable = ["invalid-name", "import-outside-toplevel", "abstract-method"]
+
 [tool.pytest.ini_options]
 testpaths = ["tests"]
 addopts = "--ignore=__init__.py"
